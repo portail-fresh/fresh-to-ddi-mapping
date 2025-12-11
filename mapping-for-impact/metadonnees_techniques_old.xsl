@@ -163,11 +163,6 @@
     <!-- docDscr: MetadataContributorName -->
     <docDscr>
       <citation>
-        <rspStmt>
-          <AuthEnty>
-            <xsl:apply-templates select="fresh:MetadataContributorName" />
-          </AuthEnty>
-        </rspStmt>
         <prodStmt>
           <producer>
             <!-- Creazione dell'attributo affiliation corretta -->
@@ -188,11 +183,21 @@
 
     <!-- additional: tutti i campi non DDI -->
     <additional>
-      <xsl:apply-templates select="fresh:Provenance" />
       <xsl:apply-templates select="//RelatedDocument" />
       <!-- CreationDate e LastUpdatedManual -->
-      <xsl:call-template name="creationDate"/>
-      <xsl:call-template name="lastUpdatedManual"/>
+      <creationDate lang="fr">
+        <xsl:value-of select="normalize-space(Metadonnees/DateCreationFicheFR)" />
+      </creationDate>
+      <creationDate lang="en">
+        <xsl:value-of select="normalize-space(Metadonnees/DateCreationFicheEN)" />
+      </creationDate>
+
+      <lastUpdatedManual lang="fr">
+        <xsl:value-of select="normalize-space(Metadonnees/DateChangementStatutFicheFR)" />
+      </lastUpdatedManual>
+      <lastUpdatedManual lang="en">
+        <xsl:value-of select="normalize-space(Metadonnees/DateChangementStatutFicheEN)" />
+      </lastUpdatedManual>
 
       <fundingAgent>
         <xsl:apply-templates select="//fresh:FundingAgentTypeFR | //fresh:FundingAgentTypeEN" />
@@ -200,7 +205,7 @@
 
 
       <theme>
-        <xsl:apply-templates select="//fresh:RareDiseasesFR" />
+
       </theme>
 
       <governance>
@@ -209,7 +214,7 @@
       <collaborations>
         <xsl:apply-templates select="//PartenariatEtReseauxFR" />
       </collaborations>
-      
+      <xsl:apply-templates select="//fresh:RareDiseasesFR" />
       <mockSample>
         <xsl:apply-templates select="//fresh:MockSampleAvailableFR | //fresh:MockSampleAvailableEN" />
         <xsl:apply-templates select="//fresh:MockSampleLocationFR | //fresh:MockSampleLocationEN" />
@@ -240,7 +245,7 @@
       </geographicalCoverage>
 
       <activeFollowUp>
-        <xsl:apply-templates select="//SuiviDesParticipantsFR" />
+        <xsl:apply-templates select="//SuiviDesParticipantsFR | //SuiviDesParticipantsEN" />
       </activeFollowUp>
 
       <dataCollectionIntegration>
@@ -272,51 +277,6 @@
   </xsl:template>
 
   <!-- MetadataContributorName → AuthEnty -->
-  <xsl:template name="creationDate">
-    <!-- Lettura date -->
-    <xsl:variable name="dateFR" select="normalize-space(Metadonnees/DateCreationFicheFR)" />
-    <xsl:variable name="dateEN" select="normalize-space(Metadonnees/DateCreationFicheEN)" />
-
-    <!-- Converti dd/MM/yyyy → yyyy-MM-dd -->
-    <xsl:variable name="dateFR_iso"
-      select="concat(substring($dateFR,7,4),'-',substring($dateFR,4,2),'-',substring($dateFR,1,2))" />
-    <xsl:variable name="dateEN_iso"
-      select="concat(substring($dateEN,7,4),'-',substring($dateEN,4,2),'-',substring($dateEN,1,2))" />
-
-    <!-- Prendi la data più vecchia -->
-    <xsl:variable name="minDate_iso" select="min(($dateFR_iso, $dateEN_iso))" />
-
-    <!-- Riconversione yyyy-MM-dd → dd-MM-yyyy -->
-    <xsl:variable name="minDate_out"
-      select="concat(substring($minDate_iso,9,2),'-',substring($minDate_iso,6,2),'-',substring($minDate_iso,1,4))" />
-
-    <creationDate>
-      <xsl:value-of select="$minDate_out" />
-    </creationDate>
-  </xsl:template>
-
-  <xsl:template name="lastUpdatedManual">
-    <!-- Lettura date -->
-    <xsl:variable name="dateFR" select="normalize-space(Metadonnees/DateChangementStatutFicheFR)" />
-    <xsl:variable name="dateEN" select="normalize-space(Metadonnees/DateChangementStatutFicheEN)" />
-
-    <!-- Converti dd/MM/yyyy → yyyy-MM-dd -->
-    <xsl:variable name="dateFR_iso"
-      select="concat(substring($dateFR,7,4),'-',substring($dateFR,4,2),'-',substring($dateFR,1,2))" />
-    <xsl:variable name="dateEN_iso"
-      select="concat(substring($dateEN,7,4),'-',substring($dateEN,4,2),'-',substring($dateEN,1,2))" />
-
-    <!-- Prendi la data più recente -->
-    <xsl:variable name="maxDate_iso" select="max(($dateFR_iso, $dateEN_iso))" />
-
-    <!-- Riconversione yyyy-MM-dd → dd-MM-yyyy -->
-    <xsl:variable name="maxDate_out"
-      select="concat(substring($maxDate_iso,9,2),'-',substring($maxDate_iso,6,2),'-',substring($maxDate_iso,1,4))" />
-
-    <lastUpdatedManual>
-      <xsl:value-of select="$maxDate_out" />
-    </lastUpdatedManual>
-  </xsl:template>
 
 
   <!-- Campi non DDI (additional) -->
@@ -372,7 +332,7 @@
   <!-- FinancementsPrecisions FR/EN → prodStmt/fundAg -->
   <xsl:template match="fresh:FundingAgent">
     <!-- FundAg FR -->
-    <fundAg>
+    <fundAg >
       <name lang="fr">
         <xsl:value-of select="normalize-space(fresh:FundingAgentName)" />
       </name>
@@ -512,16 +472,21 @@
   <!-- Sponsor → prodStmt/producer con ExtLink -->
   <xsl:template match="fresh:Sponsor">
     <producer>
-      <name lang="fr">
-        <xsl:value-of select="normalize-space(fresh:SponsorName)" />
-      </name>
-      <name lang="en">
-        <xsl:value-of select="normalize-space(fresh:SponsorName)" />
+      <role>
+        sponsor
+      </role>
+      <name>
+        <titl lang="fr">
+          <xsl:value-of select="normalize-space(fresh:SponsorName)" />
+        </titl>
+        <titl lang="en">
+          <xsl:value-of select="normalize-space(fresh:SponsorName)" />
+        </titl>
       </name>
       <xsl:apply-templates select="fresh:SponsorTypeFR | fresh:SponsorTypeEN" />
       <!-- Ciclo sugli eventuali PID -->
       <xsl:for-each select="fresh:SponsorPID">
-        <extlink>
+        <extlink role="sponsor">
           <title>
             <xsl:value-of select="normalize-space(fresh:PIDSchema)" />
           </title>
@@ -708,9 +673,11 @@
 
   <!-- fresh:RareDiseases → stdyDscr/stdyInfo/subject/rareDiseases -->
   <xsl:template match="fresh:RareDiseasesFR">
-      <RareDiseases>
+    <xsl:for-each select="value">
+      <rareDiseases>
         <xsl:value-of select="normalize-space(.)" />
-      </RareDiseases>
+      </rareDiseases>
+    </xsl:for-each>
   </xsl:template>
 
   <!-- TailleBaseFR/EN → stdyDscr/method/dataColl/targetSampleSize -->
@@ -825,17 +792,14 @@
 
     <avlStatus lang="{$lang}">
       <xsl:value-of select="normalize-space(.)" />
-      <xsl:if test="@uri and normalize-space(@uri) != ''">
-        <extLink>
-          <title>
-            <xsl:value-of select="normalize-space(@vocab)" />
-          </title>
-          <uri>
-            <xsl:value-of select="normalize-space(@uri)" />
-          </uri>
-        </extLink>
-      </xsl:if>
-
+      <extLink>
+        <title>
+          <xsl:value-of select="normalize-space(@vocab)" />
+        </title>
+        <uri>
+          <xsl:value-of select="normalize-space(@uri)" />
+        </uri>
+      </extLink>
     </avlStatus>
   </xsl:template>
 
