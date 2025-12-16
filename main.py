@@ -3,7 +3,7 @@ import json
 import xmltodict
 from saxonche import PySaxonProcessor
 
-FORCE_LIST_TAGS=["extLink", "extlink", "contact", "producer","AuthEnty","fundAg","sources"]
+FORCE_LIST_TAGS=("extLink", "extlink", "contact", "producer","AuthEnty","fundAg","sources")
 
 def execute_xsl_transformation(xml_file, xsl_file):
     """Trasforma un file XML usando un XSLT con Saxon/C."""
@@ -51,7 +51,10 @@ def xml_string_to_json(xml_string):
             return key[1:], value
         # Sostituisce None (elemento vuoto) con {}
         elif value is None:
-            return key, {}
+            if key in ["email", "PILabo","frameUnit"]:
+                return key, ""
+            else:
+                return key, {}
         value=to_bool_or_same(value)
         value=normalize_sirene(value)
         return key, value

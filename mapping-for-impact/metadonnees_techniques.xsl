@@ -30,7 +30,10 @@
                     //PartenariatsEtReseauxPrecisionsFR |
                     //PartenariatsEtReseauxPrecisionsEN" />
         </rspStmt>
-        <xsl:apply-templates select="//fresh:ContactPoint" />
+        <distStmt>
+          <xsl:apply-templates select="//fresh:ContactPoint" />
+        </distStmt>
+
         <prodStmt>
           <xsl:apply-templates select="//fresh:FundingAgent" />
           <xsl:apply-templates select="//fresh:Sponsor" />
@@ -110,8 +113,8 @@
           <xsl:apply-templates select="//SexeFR | //SexeEN" />
           <xsl:apply-templates select="//TranchesAgeFR | //TranchesAgeEN" />
           <xsl:apply-templates select="//PopulationFR | //PopulationEN" />
-          <xsl:apply-templates select="//AnneePremierRecueilFR | //AnneePremierRecueilEN " />
-          <xsl:apply-templates select="//AnneeDernierRecueilFR | //AnneeDernierRecueilEN " />
+          <xsl:apply-templates select="//AnneePremierRecueilFR  " />
+          <xsl:apply-templates select="//AnneeDernierRecueilFR " />
 
         </sumDscr>
       </stdyInfo>
@@ -191,8 +194,8 @@
       <xsl:apply-templates select="fresh:Provenance" />
       <xsl:apply-templates select="//RelatedDocument" />
       <!-- CreationDate e LastUpdatedManual -->
-      <xsl:call-template name="creationDate"/>
-      <xsl:call-template name="lastUpdatedManual"/>
+      <xsl:call-template name="creationDate" />
+      <xsl:call-template name="lastUpdatedManual" />
 
       <fundingAgent>
         <xsl:apply-templates select="//fresh:FundingAgentTypeFR | //fresh:FundingAgentTypeEN" />
@@ -209,7 +212,7 @@
       <collaborations>
         <xsl:apply-templates select="//PartenariatEtReseauxFR" />
       </collaborations>
-      
+
       <mockSample>
         <xsl:apply-templates select="//fresh:MockSampleAvailableFR | //fresh:MockSampleAvailableEN" />
         <xsl:apply-templates select="//fresh:MockSampleLocationFR | //fresh:MockSampleLocationEN" />
@@ -464,49 +467,65 @@
       </xsl:for-each>
 
       <isContact>
-        <xsl:value-of select="normalize-space(fresh:isContact)" />
+        <xsl:choose>
+          <xsl:when test="string(normalize-space(fresh:isContact))">
+            <xsl:value-of select="normalize-space(fresh:isContact)" />
+          </xsl:when>
+          <xsl:otherwise>false</xsl:otherwise>
+        </xsl:choose>
       </isContact>
       <email>
-        <xsl:value-of select="normalize-space(fresh:mail)" />
+        <xsl:choose>
+          <xsl:when test="fresh:mail">
+            <xsl:value-of select="normalize-space(fresh:mail)" />
+          </xsl:when>
+          <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
       </email>
+
       <PILabo>
-        <xsl:value-of select="normalize-space(fresh:PILabo)" />
+        <xsl:choose>
+          <xsl:when test="fresh:PILabo">
+            <xsl:value-of select="normalize-space(fresh:PILabo)" />
+          </xsl:when>
+          <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
       </PILabo>
     </AuthEnty>
   </xsl:template>
 
   <!-- ContactPoint → distStmt/contact + contact:email -->
   <xsl:template match="fresh:ContactPoint">
-    <distStmt>
-      <contact>
-        <name>
-          <xsl:value-of select="normalize-space(fresh:ContactName)" />
-        </name>
 
-        <email>
-          <xsl:value-of select="normalize-space(fresh:EMail)" />
-        </email>
+    <contact>
+      <name>
+        <xsl:value-of select="normalize-space(fresh:ContactName)" />
+      </name>
 
-        <affiliation lang="fr">
-          <xsl:value-of select="normalize-space(fresh:Affiliation)" />
-        </affiliation>
-        <affiliation lang="en">
-          <xsl:value-of select="normalize-space(fresh:Affiliation)" />
-        </affiliation>
+      <email>
+        <xsl:value-of select="normalize-space(fresh:EMail)" />
+      </email>
 
-        <xsl:for-each select="fresh:OrganisationID">
-          <extlink>
-            <uri>
-              <xsl:value-of select="normalize-space(fresh:URI)" />
-            </uri>
-            <role>organisation id</role>
-            <title>
-              <xsl:value-of select="normalize-space(fresh:PIDSchema)" />
-            </title>
-          </extlink>
-        </xsl:for-each>
-      </contact>
-    </distStmt>
+      <affiliation lang="fr">
+        <xsl:value-of select="normalize-space(fresh:Affiliation)" />
+      </affiliation>
+      <affiliation lang="en">
+        <xsl:value-of select="normalize-space(fresh:Affiliation)" />
+      </affiliation>
+
+      <xsl:for-each select="fresh:OrganisationID">
+        <extlink>
+          <uri>
+            <xsl:value-of select="normalize-space(fresh:URI)" />
+          </uri>
+          <role>organisation id</role>
+          <title>
+            <xsl:value-of select="normalize-space(fresh:PIDSchema)" />
+          </title>
+        </extlink>
+      </xsl:for-each>
+    </contact>
+
   </xsl:template>
 
   <!-- Sponsor → prodStmt/producer con ExtLink -->
@@ -708,9 +727,9 @@
 
   <!-- fresh:RareDiseases → stdyDscr/stdyInfo/subject/rareDiseases -->
   <xsl:template match="fresh:RareDiseasesFR">
-      <RareDiseases>
-        <xsl:value-of select="normalize-space(.)" />
-      </RareDiseases>
+    <RareDiseases>
+      <xsl:value-of select="normalize-space(.)" />
+    </RareDiseases>
   </xsl:template>
 
   <!-- TailleBaseFR/EN → stdyDscr/method/dataColl/targetSampleSize -->
@@ -1347,7 +1366,7 @@
 
 
   <!-- AnneePremierRecueilFR/EN → stdyDscr/stdyInfo/sumDscr/collDate (event="start") -->
-  <xsl:template match="AnneePremierRecueilFR | AnneePremierRecueilEN">
+  <xsl:template match="AnneePremierRecueilFR ">
     <xsl:variable name="lang">
       <xsl:choose>
         <xsl:when test="self::AnneePremierRecueilFR">fr</xsl:when>
@@ -1355,13 +1374,13 @@
       </xsl:choose>
     </xsl:variable>
 
-    <collDate event="start" lang="{$lang}">
+    <collDate event="start" >
       <xsl:value-of select="normalize-space(.)" />
     </collDate>
   </xsl:template>
 
   <!-- AnneeDernierRecueilFR/EN → stdyDscr/stdyInfo/sumDscr/collDate (event="end") -->
-  <xsl:template match="AnneeDernierRecueilFR | AnneeDernierRecueilEN">
+  <xsl:template match="AnneeDernierRecueilFR ">
     <xsl:variable name="lang">
       <xsl:choose>
         <xsl:when test="self::AnneeDernierRecueilFR">fr</xsl:when>
@@ -1369,7 +1388,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <collDate event="end" lang="{$lang}">
+    <collDate event="end">
       <xsl:value-of select="normalize-space(.)" />
     </collDate>
   </xsl:template>
@@ -1473,7 +1492,7 @@
         <xsl:attribute name="vocabURI">
           <xsl:value-of select="@uri" />
         </xsl:attribute>
-        <xsl:value-of select="normalize-space(.)" />
+        <xsl:attribute name="vocab">CESSDA</xsl:attribute>
       </concept>
     </collMode>
   </xsl:template>
@@ -1492,8 +1511,10 @@
         <xsl:attribute name="vocabURI">
           <xsl:value-of select="@uri" />
         </xsl:attribute>
-        <xsl:value-of select="normalize-space(.)" />
+        <xsl:attribute name="vocab">CESSDA</xsl:attribute>
+        
       </concept>
+      <xsl:value-of select="normalize-space(.)" />
     </sampProc>
   </xsl:template>
 
