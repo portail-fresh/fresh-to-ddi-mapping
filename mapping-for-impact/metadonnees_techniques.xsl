@@ -109,7 +109,7 @@
               </concept>
             </nation>
           </xsl:if>
-          <xsl:apply-templates select="//RegionsConcerneesFR | //RegionsConcerneesEN" />
+          <xsl:apply-templates select="//RegionsConcerneesFR" />
           <xsl:apply-templates select="//SexeFR | //SexeEN" />
           <xsl:apply-templates select="//TranchesAgeFR | //TranchesAgeEN" />
           <xsl:apply-templates select="//PopulationFR | //PopulationEN" />
@@ -1237,17 +1237,20 @@
     </nation>
   </xsl:template>
 
-  <!-- RegionsConcerneesFR/EN → geogCover -->
+  <!-- RegionsConcerneesFR → geogCover -->
   <xsl:template match="RegionsConcerneesFR">
-    <xsl:variable name="frValue" select="//RegionsConcerneesFR/value" />
 
-    <geogCover lang="fr">
-      <xsl:value-of select="$frValue" />
-    </geogCover>
 
-    <geogCover lang="en">
-      <xsl:value-of select="$frValue" />
-    </geogCover>
+    <xsl:for-each select="value">
+      <geogCover lang="fr">
+        <xsl:value-of select="normalize-space(.)" />
+      </geogCover>
+
+      <geogCover lang="en">
+        <xsl:value-of select="normalize-space(.)" />
+      </geogCover>
+    </xsl:for-each>
+
   </xsl:template>
 
   <!-- ChampGeographiquePrecisionsFR/EN → geoDetail -->
@@ -1374,7 +1377,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <collDate event="start" >
+    <collDate event="start">
       <xsl:value-of select="normalize-space(.)" />
     </collDate>
   </xsl:template>
@@ -1512,7 +1515,7 @@
           <xsl:value-of select="@uri" />
         </xsl:attribute>
         <xsl:attribute name="vocab">CESSDA</xsl:attribute>
-        
+
       </concept>
       <xsl:value-of select="normalize-space(.)" />
     </sampProc>
