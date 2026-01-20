@@ -382,21 +382,21 @@
       <name lang="en">
         <xsl:value-of select="normalize-space(fresh:FundingAgentName)" />
       </name>
-      <type lang="fr">
+      <!-- <type lang="fr">
         <xsl:value-of select="normalize-space(fresh:FundingAgentTypeFR)" />
       </type>
       <type lang="en">
         <xsl:value-of select="normalize-space(fresh:FundingAgentTypeEN)" />
-      </type>
+      </type> -->
       <xsl:for-each select="fresh:FundingAgentPID">
-        <extlink>
+        <extLink>
           <title>
             <xsl:value-of select="normalize-space(fresh:PIDSchema)" />
           </title>
           <uri>
             <xsl:value-of select="normalize-space(fresh:URL)" />
           </uri>
-        </extlink>
+        </extLink>
       </xsl:for-each>
     </fundAg>
   </xsl:template>
@@ -431,7 +431,7 @@
 
       <!-- Ciclo su tutti i PID -->
       <xsl:for-each select="fresh:PiID">
-        <extlink>
+        <extLink>
           <uri>
             <xsl:value-of select="normalize-space(fresh:URI)" />
           </uri>
@@ -439,11 +439,11 @@
           <title>
             <xsl:value-of select="normalize-space(fresh:PIDSchema)" />
           </title>
-        </extlink>
+        </extLink>
       </xsl:for-each>
 
       <xsl:for-each select="fresh:OrganisationID">
-        <extlink>
+        <extLink>
           <uri>
             <xsl:value-of select="normalize-space(fresh:URI)" />
           </uri>
@@ -451,11 +451,11 @@
           <title>
             <xsl:value-of select="normalize-space(fresh:PIDSchema)" />
           </title>
-        </extlink>
+        </extLink>
       </xsl:for-each>
 
       <xsl:for-each select="fresh:LaboID">
-        <extlink>
+        <extLink>
           <uri>
             <xsl:value-of select="normalize-space(fresh:URI)" />
           </uri>
@@ -463,7 +463,7 @@
           <title>
             <xsl:value-of select="normalize-space(fresh:PIDSchema)" />
           </title>
-        </extlink>
+        </extLink>
       </xsl:for-each>
 
       <isContact>
@@ -514,7 +514,7 @@
       </affiliation>
 
       <xsl:for-each select="fresh:OrganisationID">
-        <extlink>
+        <extLink>
           <uri>
             <xsl:value-of select="normalize-space(fresh:URI)" />
           </uri>
@@ -522,7 +522,7 @@
           <title>
             <xsl:value-of select="normalize-space(fresh:PIDSchema)" />
           </title>
-        </extlink>
+        </extLink>
       </xsl:for-each>
     </contact>
 
@@ -540,14 +540,14 @@
       <xsl:apply-templates select="fresh:SponsorTypeFR | fresh:SponsorTypeEN" />
       <!-- Ciclo sugli eventuali PID -->
       <xsl:for-each select="fresh:SponsorPID">
-        <extlink>
+        <extLink>
           <title>
             <xsl:value-of select="normalize-space(fresh:PIDSchema)" />
           </title>
           <uri>
             <xsl:value-of select="normalize-space(fresh:URL)" />
           </uri>
-        </extlink>
+        </extLink>
       </xsl:for-each>
     </producer>
   </xsl:template>
@@ -593,13 +593,17 @@
   PartenariatsEtReseauxPrecisionsFR |
   PartenariatsEtReseauxPrecisionsEN">
     <othId type="collaboration">
-      <xsl:attribute name="lang">
-        <xsl:choose>
-          <xsl:when test="contains(local-name(), 'FR')">fr</xsl:when>
-          <xsl:otherwise>en</xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      <xsl:value-of select="normalize-space(.)" />
+
+      <affiliation>
+        <xsl:attribute name="lang">
+          <xsl:choose>
+            <xsl:when test="contains(local-name(), 'FR')">fr</xsl:when>
+            <xsl:otherwise>en</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:value-of select="normalize-space(.)" />
+      </affiliation>
+
     </othId>
   </xsl:template>
 
