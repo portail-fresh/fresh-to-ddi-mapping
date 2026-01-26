@@ -136,11 +136,9 @@ def xml_string_to_json(xml_string):
 
         # Replace None (empty elements) with {} or empty string
         elif value is None:
-<<<<<<< HEAD
+
             if key in ["email", "PILabo"]: #Remove frameUnit
-=======
-            if key in ["email", "PILabo"]: #"frameUnit" has been removed to match impact feedback.
->>>>>>> 686edfe91d07e4682a51c1a1f5fe1ec4a1ffa450
+
                 return key, ""
             else:
                 return key, {}
