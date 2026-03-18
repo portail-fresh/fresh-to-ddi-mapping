@@ -277,7 +277,7 @@ def process_xml_folder(input_folder, xsl_file, intermediate_folder, output_json_
             json_data = xml_string_to_json(transformed_xml)
 
             # Apply domain-specific cleanups
-            filter_extlinks(json_data)
+            #filter_extlinks(json_data)
             transform_authenty_in_docdscr(json_data)
 
             # Save JSON output
